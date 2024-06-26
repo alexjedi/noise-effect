@@ -10,6 +10,8 @@ export function EffectControls({
   setSpeed,
   rollSpeed,
   setRollSpeed,
+  chromaticAberration,
+  setChromaticAberration,
 }: {
   distortion: number
   setDistortion: (value: number) => void
@@ -19,11 +21,13 @@ export function EffectControls({
   setSpeed: (value: number) => void
   rollSpeed: number
   setRollSpeed: (value: number) => void
+  chromaticAberration: number
+  setChromaticAberration: (value: number) => void
 }) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 p-4 bg-black bg-opacity-50 text-white z-20">
+    <div className="p-4 flex flex-col">
       <div className="mb-2">
-        <label>Distortion: {distortion.toFixed(2)}</label>
+        <label>Horizantal distortion: {distortion.toFixed(2)}</label>
         <Slider
           value={[distortion]}
           onValueChange={(value) => setDistortion(value[0])}
@@ -32,7 +36,7 @@ export function EffectControls({
         />
       </div>
       <div className="mb-2">
-        <label>Distortion 2: {distortion2.toFixed(2)}</label>
+        <label>Verticall Distortion: {distortion2.toFixed(2)}</label>
         <Slider
           value={[distortion2]}
           onValueChange={(value) => setDistortion2(value[0])}
@@ -41,7 +45,7 @@ export function EffectControls({
         />
       </div>
       <div className="mb-2">
-        <label>Speed: {speed.toFixed(2)}</label>
+        <label>Distortion Speed: {speed.toFixed(2)}</label>
         <Slider value={[speed]} onValueChange={(value) => setSpeed(value[0])} max={1} step={0.01} />
       </div>
       <div className="mb-2">
@@ -49,6 +53,15 @@ export function EffectControls({
         <Slider
           value={[rollSpeed]}
           onValueChange={(value) => setRollSpeed(value[0])}
+          max={1}
+          step={0.01}
+        />
+      </div>
+      <div className="mb-2">
+        <label>Chromatic Aberration: {chromaticAberration.toFixed(2)}</label>
+        <Slider
+          value={[chromaticAberration]}
+          onValueChange={(value) => setChromaticAberration(value[0])}
           max={1}
           step={0.01}
         />

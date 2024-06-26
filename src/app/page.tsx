@@ -24,11 +24,20 @@ import { Canvas } from '@react-three/fiber'
 import { Suspense, useState } from 'react'
 import { EffectControls } from '@/components/EffectControlls'
 
+const projectLinks = {
+  code: 'https://github.com/alexjedi/noise-effect',
+  framer: '',
+  twitter: 'https://twitter.com/pxl_alexjedi',
+  linkedin: 'https://www.linkedin.com/in/alex-shelvey/',
+  dribbble: 'https://dribbble.com/pxlhead',
+}
+
 export default function Home() {
   const [distortion, setDistortion] = useState(3.0)
   const [distortion2, setDistortion2] = useState(5.0)
   const [speed, setSpeed] = useState(0.2)
   const [rollSpeed, setRollSpeed] = useState(0.1)
+  const [chromaticAberration, setChromaticAberration] = useState(0.1)
   const { toast } = useToast()
   return (
     <main className="relative flex w-screen h-screen flex-col items-start justify-center p-24">
@@ -39,37 +48,36 @@ export default function Home() {
             distortion2={distortion2}
             speed={speed}
             rollSpeed={rollSpeed}
+            chromaticAberration={chromaticAberration}
           />
         </Suspense>
       </Canvas>
-      <EffectControls
-        distortion={distortion}
-        setDistortion={setDistortion}
-        distortion2={distortion2}
-        setDistortion2={setDistortion2}
-        speed={speed}
-        setSpeed={setSpeed}
-        rollSpeed={rollSpeed}
-        setRollSpeed={setRollSpeed}
-      />
       <div className="w-full p-12 fixed flex justify-between items-center top-0 right-0 left-0">
-        <CustomLink href="https://github.com/alexjedi">
-          <Image
-            src={profilePic}
-            className="w-6 h-6 rounded-full mr-1"
-            alt="Picture of the author"
-          />
-          <span className="text-xl font-medium ml-2">Alex Shevliakov</span>
-        </CustomLink>
         <div className="flex space-x-2 items-center">
-          <CustomLink href="https://magnetic-wrapper.vercel.app/performance">
-            <TestTubeDiagonal size={24} strokeWidth={2} className="text-muted-foreground" />
+          <CustomLink href="https://github.com/alexjedi">
+            <Image
+              src={profilePic}
+              className="w-6 h-6 rounded-full mr-1"
+              alt="Picture of the author"
+            />
+            <span className="text-xl font-medium ml-2">Alex Shevliakov</span>
           </CustomLink>
-          <CustomLink href="https://github.com/alexjedi/magnetic-wrapper">
+          <CustomLink href={projectLinks.code}>
             <Star size={24} strokeWidth={2} className="text-muted-foreground" />
           </CustomLink>
-          <CustomLink href="https://github.com/alexjedi/magnetic-wrapper">
+        </div>
+        <div className="flex space-x-2 items-center">
+          <CustomLink href={projectLinks.code}>
             <Github size={24} strokeWidth={2} className="text-muted-foreground" />
+          </CustomLink>
+          <CustomLink href={projectLinks.twitter}>
+            <Twitter size={24} className="text-muted-foreground" />
+          </CustomLink>
+          <CustomLink href={projectLinks.linkedin}>
+            <Linkedin size={24} strokeWidth={2} className="text-muted-foreground" />
+          </CustomLink>
+          <CustomLink href={projectLinks.dribbble}>
+            <Dribbble size={24} strokeWidth={2} className="text-muted-foreground" />
           </CustomLink>
         </div>
       </div>
@@ -117,13 +125,7 @@ export default function Home() {
               <Button
                 size={'xl'}
                 variant="outline"
-                onClick={() => {
-                  toast({
-                    title: 'Copied to clipboard!',
-                    description: 'Create a code override snippert and paste copied code there',
-                  })
-                  navigator.clipboard.writeText('')
-                }}
+                onClick={() => window.open(projectLinks.framer, '_blank')}
               >
                 <Copy size={20} strokeWidth={3} className="text-muted-foreground mr-2" />
                 Remix Effect
@@ -133,18 +135,21 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <div className="w-full p-12 fixed flex justify-between items-center bottom-0 right-0 left-0">
-        <span className="text-lg text-muted-foreground">Please, dont forget to star the repo!</span>
+      <div className="w-full p-12 fixed flex justify-between items-end bottom-0 right-0 left-0 z-10">
+        <span className="text-lg text-foreground">Please, dont forget to star the repo!</span>
         <div className="flex space-x-2 items-center">
-          <CustomLink href="https://twitter.com/pxl_alexjedi">
-            <Twitter size={24} className="text-muted-foreground" />
-          </CustomLink>
-          <CustomLink href="https://www.linkedin.com/in/alex-shelvey/">
-            <Linkedin size={24} strokeWidth={2} className="text-muted-foreground" />
-          </CustomLink>
-          <CustomLink href="https://dribbble.com/pxlhead">
-            <Dribbble size={24} strokeWidth={2} className="text-muted-foreground" />
-          </CustomLink>
+          <EffectControls
+            distortion={distortion}
+            setDistortion={setDistortion}
+            distortion2={distortion2}
+            setDistortion2={setDistortion2}
+            speed={speed}
+            setSpeed={setSpeed}
+            rollSpeed={rollSpeed}
+            setRollSpeed={setRollSpeed}
+            chromaticAberration={chromaticAberration}
+            setChromaticAberration={setChromaticAberration}
+          />
         </div>
       </div>
     </main>
