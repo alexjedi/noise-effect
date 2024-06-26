@@ -16,22 +16,41 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-import MagneticWrapper from '@/components/MagneticFrame'
 import CustomLink from '@/components/ui/link'
 import Image from 'next/image'
 import profilePic from '@/app/avatar.png'
-import ThreeScene from '@/components/ThreeScene'
+import { NoiseEffect } from '@/components/ThreeScene'
+import { Canvas } from '@react-three/fiber'
+import { Suspense, useState } from 'react'
+import { EffectControls } from '@/components/EffectControlls'
 
 export default function Home() {
+  const [distortion, setDistortion] = useState(3.0)
+  const [distortion2, setDistortion2] = useState(5.0)
+  const [speed, setSpeed] = useState(0.2)
+  const [rollSpeed, setRollSpeed] = useState(0.1)
   const { toast } = useToast()
   return (
     <main className="relative flex w-screen h-screen flex-col items-start justify-center p-24">
-      <video
-        src="https://videos.pexels.com/video-files/5680034/5680034-hd_1920_1080_24fps.mp4"
-        className="fixed inset-0 h-screen z-0"
-        muted
-        loop
-        autoPlay
+      <Canvas className="!fixed inset-0 z-0">
+        <Suspense fallback={null}>
+          <NoiseEffect
+            distortion={distortion}
+            distortion2={distortion2}
+            speed={speed}
+            rollSpeed={rollSpeed}
+          />
+        </Suspense>
+      </Canvas>
+      <EffectControls
+        distortion={distortion}
+        setDistortion={setDistortion}
+        distortion2={distortion2}
+        setDistortion2={setDistortion2}
+        speed={speed}
+        setSpeed={setSpeed}
+        rollSpeed={rollSpeed}
+        setRollSpeed={setRollSpeed}
       />
       <div className="w-full p-12 fixed flex justify-between items-center top-0 right-0 left-0">
         <CustomLink href="https://github.com/alexjedi">

@@ -1,104 +1,170 @@
-'use client'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { extend, useFrame, useThree } from '@react-three/fiber'
+import { ShaderMaterial, VideoTexture, DoubleSide } from 'three'
 
-import React, { useRef, useEffect } from 'react'
-import { Canvas, useFrame, extend, useThree } from '@react-three/fiber'
-import { OrthographicCamera } from '@react-three/drei'
-import * as THREE from 'three'
-//@ts-ignore
-import fragmentShader from '@/lib/fragment.glsl'
+const NoiseShaderMaterial = {
+  uniforms: {
+    tDiffuse: { type: 't', value: null },
+    time: { type: 'f', value: 0.0 },
+    distortion: { type: 'f', value: 3.0 },
+    distortion2: { type: 'f', value: 5.0 },
+    speed: { type: 'f', value: 0.2 },
+    rollSpeed: { type: 'f', value: 0.1 },
+  },
 
-extend({ OrthographicCamera })
+  vertexShader: [
+    'varying vec2 vUv;',
+    'void main() {',
+    'vUv = uv;',
+    'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+    '}',
+  ].join('\n'),
 
-const ShaderMaterial = () => {
-  const materialRef = useRef<any>()
-  const { size } = useThree()
-  const vScroll = useRef(300)
-  const vScrollDamp = useRef(0)
-  const vResolution = useRef(new THREE.Vector2(size.width, size.height))
+  fragmentShader: [
+    'uniform sampler2D tDiffuse;',
+    'uniform float time;',
+    'uniform float distortion;',
+    'uniform float distortion2;',
+    'uniform float speed;',
+    'uniform float rollSpeed;',
+    'varying vec2 vUv;',
 
-  useEffect(() => {
-    const onScroll = () => {
-      vScroll.current = window.scrollY
-    }
-    window.addEventListener('scroll', onScroll)
+    // Start Ashima 2D Simplex Noise
 
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-    }
-  }, [])
+    'vec3 mod289(vec3 x) {',
+    '  return x - floor(x * (1.0 / 289.0)) * 289.0;',
+    '}',
 
-  useFrame((state, delta) => {
-    vScrollDamp.current += (vScroll.current - vScrollDamp.current) * delta * 0.1
-    if (materialRef.current) {
-      materialRef.current.uniforms.u_mouse.value = new THREE.Vector2(
-        state.size.width / 4,
-        vScrollDamp.current
-      )
-      materialRef.current.uniforms.u_resolution.value.set(state.size.width, state.size.height)
+    'vec2 mod289(vec2 x) {',
+    '  return x - floor(x * (1.0 / 289.0)) * 289.0;',
+    '}',
+
+    'vec3 permute(vec3 x) {',
+    '  return mod289(((x*34.0)+1.0)*x);',
+    '}',
+
+    'float snoise(vec2 v)',
+    '  {',
+    '  const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0',
+    '                      0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)',
+    '                     -0.577350269189626,  // -1.0 + 2.0 * C.x',
+    '                      0.024390243902439); // 1.0 / 41.0',
+    '  vec2 i  = floor(v + dot(v, C.yy) );',
+    '  vec2 x0 = v -   i + dot(i, C.xx);',
+
+    '  vec2 i1;',
+    '  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);',
+    '  vec4 x12 = x0.xyxy + C.xxzz;',
+    ' x12.xy -= i1;',
+
+    '  i = mod289(i); // Avoid truncation effects in permutation',
+    '  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))',
+    '		+ i.x + vec3(0.0, i1.x, 1.0 ));',
+
+    '  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);',
+    '  m = m*m ;',
+    '  m = m*m ;',
+
+    '  vec3 x = 2.0 * fract(p * C.www) - 1.0;',
+    '  vec3 h = abs(x) - 0.5;',
+    '  vec3 ox = floor(x + 0.5);',
+    '  vec3 a0 = x - ox;',
+
+    '  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );',
+
+    '  vec3 g;',
+    '  g.x  = a0.x  * x0.x  + h.x  * x0.y;',
+    '  g.yz = a0.yz * x12.xz + h.yz * x12.yw;',
+    '  return 130.0 * dot(m, g);',
+    '}',
+
+    // End Ashima 2D Simplex Noise
+
+    'void main() {',
+
+    'vec2 p = vUv;',
+    'float ty = time*speed;',
+    'float yt = p.y - ty;',
+    //smooth distortion
+    'float offset = snoise(vec2(yt*3.0,0.0))*0.2;',
+    // boost distortion
+    'offset = offset*distortion * offset*distortion * offset;',
+    //add fine grain distortion
+    'offset += snoise(vec2(yt*50.0,0.0))*distortion2*0.001;',
+    //combine distortion on X with roll on Y
+    'gl_FragColor = texture2D(tDiffuse,  vec2(fract(p.x + offset),fract(p.y-time*rollSpeed) ));',
+
+    '}',
+  ].join('\n'),
+}
+
+extend({ NoiseShaderMaterial })
+
+export function NoiseEffect({
+  distortion,
+  distortion2,
+  speed,
+  rollSpeed,
+}: {
+  distortion: number
+  distortion2: number
+  speed: number
+  rollSpeed: number
+}) {
+  useFrame((state) => {
+    if (shaderMaterial && videoTexture) {
+      shaderMaterial.uniforms.time.value = state.clock.getElapsedTime()
+      shaderMaterial.uniforms.tDiffuse.value = videoTexture
+      shaderMaterial.uniforms.distortion.value = distortion
+      shaderMaterial.uniforms.distortion2.value = distortion2
+      shaderMaterial.uniforms.speed.value = speed
+      shaderMaterial.uniforms.rollSpeed.value = rollSpeed
     }
   })
 
-  return (
-    <shaderMaterial
-      ref={materialRef}
-      vertexShader={`
-        varying vec2 v_texcoord;
-        void main() {
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          v_texcoord = uv;
-        }
-      `}
-      fragmentShader={fragmentShader}
-      uniforms={{
-        u_mouse: { value: new THREE.Vector2(0, vScrollDamp.current) },
-        u_resolution: { value: new THREE.Vector2(size.width, size.height) },
-        u_pixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
-      }}
-      defines={{
-        VAR: 2,
-      }}
-    />
-  )
-}
+  const materialRef = useRef()
+  const videoRef = useRef()
+  const [videoTexture, setVideoTexture] = useState(null)
 
-const Plane = () => {
-  const meshRef = useRef<any>()
-  const { size } = useThree()
+  const shaderMaterial = useMemo(() => new ShaderMaterial(NoiseShaderMaterial), [])
 
   useEffect(() => {
-    const handleResize = () => {
-      if (meshRef.current) {
-        meshRef.current.scale.set(size.width, size.height, 1)
-      }
+    const video = document.createElement('video')
+    video.src = 'https://videos.pexels.com/video-files/8721932/8721932-uhd_2732_1440_25fps.mp4'
+    video.loop = true
+    video.muted = true
+    video.playsInline = true
+    video.crossOrigin = 'anonymous'
+    video.load()
+
+    video.onloadeddata = () => {
+      video.play()
+      const texture = new VideoTexture(video)
+      setVideoTexture(texture)
     }
 
-    handleResize()
-    window.addEventListener('resize', handleResize)
+    videoRef.current = video
 
     return () => {
-      window.removeEventListener('resize', handleResize)
+      video.pause()
+      video.src = ''
+      video.load()
     }
-  }, [size])
+  }, [])
+
+  useFrame((state) => {
+    if (shaderMaterial && videoTexture) {
+      shaderMaterial.uniforms.time.value = state.clock.getElapsedTime()
+      shaderMaterial.uniforms.tDiffuse.value = videoTexture
+    }
+  })
+
+  const { viewport } = useThree()
 
   return (
-    <mesh ref={meshRef}>
-      <planeGeometry args={[1, 1]} />
-      <ShaderMaterial />
+    <mesh scale={[viewport.width, viewport.height, 1]}>
+      <planeGeometry />
+      <primitive object={shaderMaterial} ref={materialRef} attach="material" side={DoubleSide} />
     </mesh>
   )
 }
-
-const ThreeScene = () => {
-  return (
-    <section className="relative w-100vw h-[300vh] overflow-scroll">
-      <div className="w-100vw h-100vh fixed inset-0">
-        <Canvas gl={{ antialias: true }} dpr={[1, 1]}>
-          <OrthographicCamera makeDefault position={[0, 0, 1]} zoom={1} />
-          <Plane />
-        </Canvas>
-      </div>
-    </section>
-  )
-}
-
-export default ThreeScene
