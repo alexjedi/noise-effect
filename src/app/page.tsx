@@ -23,10 +23,11 @@ import { NoiseEffect } from '@/components/ThreeScene'
 import { Canvas } from '@react-three/fiber'
 import { Suspense, useState } from 'react'
 import { EffectControls } from '@/components/EffectControlls'
+import { component } from '@/lib/copyable'
 
 const projectLinks = {
   code: 'https://github.com/alexjedi/noise-effect',
-  framer: '',
+  framer: 'https://framer.com/projects/new?duplicate=4nZDiYRDmL3lVtSryEzt',
   twitter: 'https://twitter.com/pxl_alexjedi',
   linkedin: 'https://www.linkedin.com/in/alex-shelvey/',
   dribbble: 'https://dribbble.com/pxlhead',
@@ -38,6 +39,7 @@ export default function Home() {
   const [speed, setSpeed] = useState(0.2)
   const [rollSpeed, setRollSpeed] = useState(0.1)
   const [chromaticAberration, setChromaticAberration] = useState(0.1)
+  const videoUrl = 'https://videos.pexels.com/video-files/8721932/8721932-uhd_2732_1440_25fps.mp4'
   const { toast } = useToast()
   return (
     <main className="relative flex w-screen h-screen flex-col items-start justify-center p-24">
@@ -49,6 +51,7 @@ export default function Home() {
             speed={speed}
             rollSpeed={rollSpeed}
             chromaticAberration={chromaticAberration}
+            videoUrl={videoUrl}
           />
         </Suspense>
       </Canvas>
@@ -82,7 +85,7 @@ export default function Home() {
         </div>
       </div>
       <section className="w-full h-full flex items-center justify-center z-10">
-        <div className="flex flex-col space-y-16">
+        <div className="flex flex-col space-y-8">
           <div className="w-full flex flex-col items-center space-y-4">
             <h1 className='className="border-b pb-2 text-5xl font-semibold tracking-tight first:mt-0"'>
               Noise Effect{' '}
@@ -113,7 +116,7 @@ export default function Home() {
                     title: 'Copied to clipboard!',
                     description: 'Create a new component and paste copied code there',
                   })
-                  navigator.clipboard.writeText('')
+                  navigator.clipboard.writeText(component)
                 }}
               >
                 <Copy size={20} strokeWidth={3} className="text-muted-foreground mr-2" />
@@ -135,9 +138,30 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <div className="w-full p-12 fixed flex justify-between items-end bottom-0 right-0 left-0 z-10">
-        <span className="text-lg text-foreground">Please, dont forget to star the repo!</span>
-        <div className="flex space-x-2 items-center">
+      <div className="w-full p-12 fixed flex justify-between items-end bottom-0 right-0 left-0 z-10 pointer-events-none">
+        <div className="space-y-2 pointer-events-auto">
+          <p className="text-base text-muted-foreground">
+            Video by <span className="text-foreground">cottonbro studio</span> on{' '}
+            <a
+              href="https://www.pexels.com/video/woman-typing-on-a-keyboard-while-wearing-a-vr-headset-8721932/"
+              target="_blank"
+              className="text-foreground underline"
+            >
+              Pexels
+            </a>
+          </p>
+          <p className="text-base text-muted-foreground">
+            Uses WebGL Noises by{' '}
+            <a
+              href="https://github.com/stegu/webgl-noise/"
+              target="_blank"
+              className="text-foreground underline"
+            >
+              Stefan Gustavson
+            </a>
+          </p>
+        </div>
+        <div className="flex flex-col space-y-2 pointer-events-auto">
           <EffectControls
             distortion={distortion}
             setDistortion={setDistortion}
@@ -150,6 +174,7 @@ export default function Home() {
             chromaticAberration={chromaticAberration}
             setChromaticAberration={setChromaticAberration}
           />
+          <p className="text-base text-foreground">Please, dont forget to star the repo!</p>
         </div>
       </div>
     </main>

@@ -25,9 +25,18 @@ export function EffectControls({
   setChromaticAberration: (value: number) => void
 }) {
   return (
-    <div className="p-4 flex flex-col">
-      <div className="mb-2">
-        <label>Horizantal distortion: {distortion.toFixed(2)}</label>
+    <div className="p-4 flex flex-col space-y-5 w-64">
+      <div className="space-y-2">
+        <label>Chromatic Aberration: {chromaticAberration.toFixed(2)}</label>
+        <Slider
+          value={[chromaticAberration]}
+          onValueChange={(value) => setChromaticAberration(value[0])}
+          max={1}
+          step={0.01}
+        />
+      </div>
+      <div className="space-y-2">
+        <label>Horizontal distortion: {distortion.toFixed(2)}</label>
         <Slider
           value={[distortion]}
           onValueChange={(value) => setDistortion(value[0])}
@@ -35,7 +44,7 @@ export function EffectControls({
           step={0.1}
         />
       </div>
-      <div className="mb-2">
+      <div className="space-y-2">
         <label>Verticall Distortion: {distortion2.toFixed(2)}</label>
         <Slider
           value={[distortion2]}
@@ -44,24 +53,15 @@ export function EffectControls({
           step={0.1}
         />
       </div>
-      <div className="mb-2">
+      <div className="space-y-2">
         <label>Distortion Speed: {speed.toFixed(2)}</label>
         <Slider value={[speed]} onValueChange={(value) => setSpeed(value[0])} max={1} step={0.01} />
       </div>
-      <div className="mb-2">
+      <div className="space-y-2">
         <label>Roll Speed: {rollSpeed.toFixed(2)}</label>
         <Slider
           value={[rollSpeed]}
           onValueChange={(value) => setRollSpeed(value[0])}
-          max={1}
-          step={0.01}
-        />
-      </div>
-      <div className="mb-2">
-        <label>Chromatic Aberration: {chromaticAberration.toFixed(2)}</label>
-        <Slider
-          value={[chromaticAberration]}
-          onValueChange={(value) => setChromaticAberration(value[0])}
           max={1}
           step={0.01}
         />

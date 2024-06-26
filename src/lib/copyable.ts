@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+export const component = `
+  import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { extend, useFrame, useThree } from '@react-three/fiber'
 import { ShaderMaterial, VideoTexture, DoubleSide } from 'three'
 
@@ -22,7 +23,7 @@ const NoiseShaderMaterial = {
   ].join('\n'),
 
   fragmentShader: [
-    `uniform sampler2D tDiffuse;
+    \`uniform sampler2D tDiffuse;
 uniform float time;
 uniform float distortion;
 uniform float distortion2;
@@ -104,7 +105,7 @@ void main() {
 
   gl_FragColor = vec4(r, g, b, 1.0);
 }
-`,
+\`,
   ].join('\n'),
 }
 
@@ -183,3 +184,5 @@ export function NoiseEffect({
     </mesh>
   )
 }
+
+`

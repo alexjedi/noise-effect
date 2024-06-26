@@ -10,7 +10,7 @@ const fontSans = FontSans({
 })
 
 export const metadata: Metadata = {
-  title: 'Lens Blur',
+  title: 'Noise Effect',
   description: 'Copy and Paste magic effect ✨',
 }
 
