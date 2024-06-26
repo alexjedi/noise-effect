@@ -138,8 +138,8 @@ export function NoiseEffect({
   })
 
   const materialRef = useRef()
-  const videoRef = useRef()
-  const [videoTexture, setVideoTexture] = useState(null)
+  const videoRef = useRef<HTMLVideoElement>()
+  const [videoTexture, setVideoTexture] = useState<VideoTexture | null>(null)
 
   const shaderMaterial = useMemo(() => new ShaderMaterial(NoiseShaderMaterial), [])
 
