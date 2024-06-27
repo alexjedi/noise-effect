@@ -45,7 +45,7 @@ export function EffectControls({
         />
       </div>
       <div className="space-y-2">
-        <label>Verticall Distortion: {distortion2.toFixed(2)}</label>
+        <label>Vertical distortion: {distortion2.toFixed(2)}</label>
         <Slider
           value={[distortion2]}
           onValueChange={(value) => setDistortion2(value[0])}
